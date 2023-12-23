@@ -1,6 +1,5 @@
 package com.cardarena.backend.models.core;
 
-import jakarta.servlet.http.PushBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
