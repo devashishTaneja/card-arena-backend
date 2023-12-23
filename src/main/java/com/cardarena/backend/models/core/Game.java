@@ -13,13 +13,14 @@ import java.util.List;
 public class Game {
     public String id;
     public Integer ownerId;
-    public Integer numOfPlayers;
     public Integer numOfCards;
     public List<Player> players;
     public Deck deck;
     public Integer chance;
-    public Integer numOfRounds;
+    public Integer currSetNumber;
     public Scorecard scorecard;
     public Table table;
-    public Integer lastRoundFirstChance;
+    public Integer lastSetFirstChance;
+    public boolean isGameFinished;
+    public boolean isSetFinished;
 }
