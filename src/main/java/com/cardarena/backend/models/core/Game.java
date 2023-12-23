@@ -19,10 +19,12 @@ public class Game {
     public List<Player> players;
     public Deck deck;
     public Integer chance;
-    public Integer numOfRounds;
+    public Integer currSetNumber;
     public Scorecard scorecard;
     public Table table;
-    public Integer lastRoundFirstChance;
+    public Integer lastSetFirstChance;
+    public boolean isGameFinished;
+    public boolean isSetFinished;
 
     // Add a method to convert the object to JSON string
     public String toString() {
