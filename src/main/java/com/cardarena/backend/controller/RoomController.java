@@ -1,6 +1,5 @@
 package com.cardarena.backend.controller;
 
-import io.socket.engineio.server.EngineIoServer;
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoServer;
 import lombok.AllArgsConstructor;
@@ -13,16 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class RoomController {
 
-    EngineIoServer mEngineIoServer;
+    SocketIoServer socketIoServer;
+//    ClientHandler clientHandler;
 
     @GetMapping("/send")
     void send() {
-        socketIoServer.namespace("/")
-                .
-        socket.send(new Packet<>(Packet.MESSAGE, "foo"));
-
+        SocketIoNamespace namespace = socketIoServer.namespace("/");
+        namespace.broadcast("room1", "event1", "asd");
     }
 
 }
-
-

@@ -1,6 +1,5 @@
 package com.cardarena.backend.config;
 
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -18,8 +17,7 @@ class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(mEngineIoHandler, "/engine.io/")
-            .addInterceptors(mEngineIoHandler);
+        registry.addHandler(mEngineIoHandler, "/socket.io/*").addInterceptors(mEngineIoHandler);
     }
 
 }

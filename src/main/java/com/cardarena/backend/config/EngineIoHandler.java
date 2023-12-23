@@ -35,7 +35,7 @@ public final class EngineIoHandler implements HandshakeInterceptor, WebSocketHan
     }
 
     @RequestMapping(
-        value = "/engine.io/",
+        value = "/socket.io/",
         method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS},
         headers = "Connection!=Upgrade")
     public void httpHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -71,19 +71,19 @@ public final class EngineIoHandler implements HandshakeInterceptor, WebSocketHan
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) {
-        ((EngineIoSpringWebSocket)webSocketSession.getAttributes().get(ATTRIBUTE_ENGINEIO_BRIDGE))
+        ((EngineIoSpringWebSocket) webSocketSession.getAttributes().get(ATTRIBUTE_ENGINEIO_BRIDGE))
             .afterConnectionClosed(closeStatus);
     }
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) {
-        ((EngineIoSpringWebSocket)webSocketSession.getAttributes().get(ATTRIBUTE_ENGINEIO_BRIDGE))
+        ((EngineIoSpringWebSocket) webSocketSession.getAttributes().get(ATTRIBUTE_ENGINEIO_BRIDGE))
             .handleMessage(webSocketMessage);
     }
 
     @Override
     public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) {
-        ((EngineIoSpringWebSocket)webSocketSession.getAttributes().get(ATTRIBUTE_ENGINEIO_BRIDGE))
+        ((EngineIoSpringWebSocket) webSocketSession.getAttributes().get(ATTRIBUTE_ENGINEIO_BRIDGE))
             .handleTransportError(throwable);
     }
 
@@ -96,7 +96,7 @@ public final class EngineIoHandler implements HandshakeInterceptor, WebSocketHan
         EngineIoSpringWebSocket(WebSocketSession session) {
             mSession = session;
 
-            final String queryString = (String)mSession.getAttributes().get(ATTRIBUTE_ENGINEIO_QUERY);
+            final String queryString = (String) mSession.getAttributes().get(ATTRIBUTE_ENGINEIO_QUERY);
             if (queryString != null) {
                 mQuery = ParseQS.decode(queryString);
             } else {
