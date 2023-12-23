@@ -1,7 +1,7 @@
 package com.cardarena.backend.services;
 
 import com.cardarena.backend.models.core.*;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +9,8 @@ import java.util.*;
 
 @Component
 @Service
+@Slf4j
 public class gameFlow {
-
-    Logger log = org.slf4j.LoggerFactory.getILoggerFactory().getLogger(gameFlow.class.getName());
 
     public Game createGame(String GameOwnerName){
         Player player = Player.builder()
