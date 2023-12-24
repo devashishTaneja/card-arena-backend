@@ -2,7 +2,7 @@ name: "EC2 Deploy"
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch: # This line enables the manual run trigger with the "Run workflow" button
 
 env:
