@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class Game {
     public String id;
-    public Integer ownerId;
+    public String ownerId;
     public Integer numOfCards;
     public List<Player> players;
     public Deck deck;
@@ -25,6 +25,10 @@ public class Game {
     public Integer lastSetFirstChance;
     public boolean isGameFinished;
     public boolean isSetFinished;
+
+    public Integer numberOfPlayers(){
+        return players.size();
+    }
 
     // Add a method to convert the object to JSON string
     public String toString() {

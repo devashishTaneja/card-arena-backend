@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 @Slf4j
@@ -48,13 +49,38 @@ public class SocketIoConfig {
                     Game game = gameService.findOrInitializeGame(room);
                     String playerId = socket.getId();
                     game = gameService.addPlayer(game, new Player(playerId, name));
-                    namespace.broadcast(room, "stateUpdate", gameService.getGameState(game, playerId).toString());
+                    broadcastGameState(namespace, game, gameService);
                     log.info("Joined room {}", room);
                 } catch (Exception e) {
                     log.error("Error joining room", e);
                     socket.send("error", e.getMessage());
                 }
             });
+
+            // Add a listener for the "join" event on the socket
+            socket.on("startGame", args1 -> {
+                try {
+                    JSONObject jsonObject = (JSONObject) args1[0];
+                    String room = jsonObject.getString("room");
+                    Game game = gameService.findOrInitializeGame(room);
+                    game = gameService.startGame(game);
+                    broadcastGameState(namespace, game, gameService);
+                    log.info("Started game {}", room);
+                } catch (Exception e) {
+                    log.error("Error starting game", e);
+                    socket.send("error", e.getMessage());
+                }
+            });
         });
+    }
+
+    private void broadcastGameState(SocketIoNamespace namespace, Game game, GameService gameService) {
+        String room = game.getId();
+        game.getPlayers().forEach(
+            player -> Arrays.stream(namespace.getAdapter().listClients(room))
+                .forEach(
+                    playerSocket -> playerSocket.send("stateUpdate", gameService.getGameState(game, playerSocket.getId()))
+                )
+        );
     }
 }
