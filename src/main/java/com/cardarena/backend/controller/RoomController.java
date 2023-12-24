@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("service/room")
+@RequestMapping("room")
 @AllArgsConstructor
 public class RoomController {
 

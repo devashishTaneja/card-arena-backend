@@ -76,11 +76,8 @@ public class SocketIoConfig {
 
     private void broadcastGameState(SocketIoNamespace namespace, Game game, GameService gameService) {
         String room = game.getId();
-        game.getPlayers().forEach(
-            player -> Arrays.stream(namespace.getAdapter().listClients(room))
-                .forEach(
-                    playerSocket -> playerSocket.send("stateUpdate", gameService.getGameState(game, playerSocket.getId()))
-                )
+        Arrays.stream(namespace.getAdapter().listClients(room)).forEach(
+            socket -> socket.send("stateUpdate", gameService.getGameState(game, socket.getId()))
         );
     }
 }
