@@ -1,0 +1,12 @@
+version: '3'
+services:
+  cardarenafe:
+    image: 729926669123.dkr.ecr.ap-south-1.amazonaws.com/cardarenafe
+    ports:
+      - "5173:5173"
+    restart: always
+  cardarenabe:
+    image: 729926669123.dkr.ecr.ap-south-1.amazonaws.com/cardarenabe
+    ports:
+      - "8080:8080"
+    restart: always
