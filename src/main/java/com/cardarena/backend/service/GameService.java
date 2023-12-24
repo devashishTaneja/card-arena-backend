@@ -1,26 +1,32 @@
 package com.cardarena.backend.service;
 
-import com.cardarena.backend.models.core.Card;
-import com.cardarena.backend.models.core.Game;
-import com.cardarena.backend.models.core.Player;
+import com.cardarena.backend.models.core.*;
 import com.cardarena.backend.repository.core.GameRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class GameService {
 
-    GameRepository gameRepository;
+    private GameRepository gameRepository;
+
+    private static final int TOTAL_CARD_COUNT = 52;
 
     public Game findOrInitializeGame(String roomId) {
         Game game = gameRepository.findById(roomId).orElse(null);
         if (game == null) {
-            game = new Game();
-            game.setId(roomId);
+            game = Game
+                .builder()
+                .id(roomId)
+                .deck(new Deck())
+                .isGameFinished(false)
+                .isSetFinished(false)
+                .build();
             gameRepository.save(game);
         }
         return game;
@@ -28,7 +34,10 @@ public class GameService {
 
     public Game addPlayer(Game game, Player player) {
         List<Player> currentPlayers = game.getPlayers();
-        if(currentPlayers == null) currentPlayers = new ArrayList<>();
+        if(currentPlayers == null){
+            currentPlayers = new ArrayList<>();
+            game.setOwnerId(player.getId());
+        }
         // Return if player already exists
         if(currentPlayers.stream().anyMatch(player1 -> player1.getId().equals(player.getId()))) return game;
         currentPlayers.add(player);
@@ -36,7 +45,7 @@ public class GameService {
         return gameRepository.save(game);
     }
 
-    public Game getGameState(Game game, String playerId) {
+    public String getGameState(Game game, String playerId) {
         List<Player> players = game.getPlayers();
         players = players.stream().peek(player -> {
             if (!player.getId().equals(playerId)) {
@@ -49,17 +58,94 @@ public class GameService {
             }
         }).toList();
         game.setPlayers(players);
-        return game;
+        return game.toString();
     }
 
     public Game startGame(Game game) {
-        game = distributeCards(game);
+        game.setCurrSetNumber(0);
+        game.setLastSetFirstChance(-1);
+        game.setScorecard(new Scorecard());
+        game.setDeck(new Deck());
+        game.getPlayers().forEach(player -> player.setCards(new ArrayList<>()));
+        startNextSet(game);
+        gameRepository.save(game);
         return game;
     }
 
-    private Game distributeCards(Game game) {
-        // Todo: Distribute cards to players
+    public Game call(Game game, Integer handsCalled) {
+        game.getScorecard().getHandsCalled().put(game.getChance(), handsCalled);
+        log.info("Player {} called {} hands!", game.getChance(), handsCalled);
+        game.setChance((game.getChance() + 1) % game.numberOfPlayers());
+        if(Objects.equals(game.getChance(), game.getLastSetFirstChance())) {
+            startRound(game);
+            game.setSetFinished(false);
+            log.info("Starting Round!");
+        }
+        gameRepository.save(game);
         return game;
+    }
+
+    public void playRound(Game game, Card card){
+        game.getTable().getCardsOnDisplay().add(card);
+        game.setChance((game.getChance()+1)%game.getPlayers().size());
+        game.getPlayers().get(game.getChance()).getCards().remove(card);
+        if(game.getTable().getCardsOnDisplay().size()==game.getPlayers().size()){
+            updateHands(game);
+            log.info("Round Finished!");
+        }
+    }
+
+    private void updateHands(Game game){
+        Card maxCard = game.getTable().getCardsOnDisplay().get(0);
+        int maxCardPlayerId = game.getChance();
+        for(int i = 1; i<game.getTable().getCardsOnDisplay().size(); i++){
+            if(game.getTable().getCardsOnDisplay().get(i).getRank().ordinal()>maxCard.getRank().ordinal()){
+                maxCard = game.getTable().getCardsOnDisplay().get(i);
+                maxCardPlayerId = (game.getChance()+i)%game.getPlayers().size();
+            }
+        }
+        game.getScorecard().getHandsWon().put(maxCardPlayerId,game.getScorecard().getHandsWon().get(maxCardPlayerId)+1);
+        log.info("Player "+maxCardPlayerId+" won the hand!");
+        game.getTable().getCardsOnDisplay().clear();
+    }
+
+    private void startRound(Game game){
+        game.setTable(new Table());
+        game.getTable().setCardsOnDisplay(new ArrayList<>());
+        game.getTable().setHiddenCards(new ArrayList<>());
+    }
+
+    private void startNextSet(Game game) {
+        int numOfPlayers = game.numberOfPlayers();
+        game.setCurrSetNumber(game.getCurrSetNumber()+1);
+        // Todo: Inform UI when game is finished
+        if(game.getCurrSetNumber()*numOfPlayers > TOTAL_CARD_COUNT ) {
+            game.setGameFinished(true);
+            log.info("Game Finished!");
+            return;
+        }
+        log.info("Starting Set: "+game.getCurrSetNumber()+",distributing "+game.getCurrSetNumber()+" cards to each player");
+        game.setChance((game.getLastSetFirstChance()+1)%numOfPlayers);
+        game.setLastSetFirstChance(game.getChance());
+        distributeCards(game, game.getCurrSetNumber());
+    }
+
+    private void distributeCards(Game game, int numOfCards){
+        int totalCardsToBeDistributed = numOfCards * game.numberOfPlayers();
+        List<Card> cards=game.getDeck().getCards();
+        for(int i=0; i<totalCardsToBeDistributed; i++){
+            Random random = new Random();
+            Card card = cards.get(random.nextInt(cards.size()+1)-1);
+            game.getPlayers().get(i % game.numberOfPlayers()).getCards().add(card);
+            cards.remove(card);
+        }
+        game.setDeck(new Deck(cards));
+    }
+
+    private Card drawCardAtRandom(Deck deck){
+        List<Card> cards=deck.getCards();
+        Random random = new Random();
+        return cards.get(random.nextInt(cards.size()));
     }
 
 }
