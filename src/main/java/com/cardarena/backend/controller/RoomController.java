@@ -16,7 +16,7 @@ public class RoomController {
 
     @GetMapping("health")
     ResponseEntity<String> health() {
-        return ResponseEntity.ok("Ok");
+        return ResponseEntity.ok("OK1");
     }
 
     @PostMapping("create")
