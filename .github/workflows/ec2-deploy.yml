@@ -56,4 +56,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_IP "aws ecr get-login-password | sudo docker login --username AWS --password-stdin $ECR_REGISTRY && \
             sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG && \
             sudo docker-compose -f /home/$EC2_USER/docker-compose.yml restart cardarenabe &&
-            sudo docker image prune -af
+            sudo docker image prune -af"
