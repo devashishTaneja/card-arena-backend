@@ -9,4 +9,8 @@ services:
     image: 729926669123.dkr.ecr.ap-south-1.amazonaws.com/cardarenabe
     ports:
       - "8080:8080"
+    environment:
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
     restart: always

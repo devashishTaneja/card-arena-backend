@@ -6,6 +6,7 @@ import com.cardarena.backend.models.core.Player;
 import com.cardarena.backend.service.GameService;
 import io.socket.engineio.server.Emitter;
 import io.socket.engineio.server.EngineIoServer;
+import io.socket.engineio.server.EngineIoServerOptions;
 import io.socket.socketio.server.SocketIoNamespace;
 import io.socket.socketio.server.SocketIoServer;
 import io.socket.socketio.server.SocketIoSocket;
@@ -24,7 +25,10 @@ public class SocketIoConfig {
 
     @Bean
     EngineIoServer engineIoServer() {
-        return new EngineIoServer();
+        EngineIoServerOptions engineIoServerOptions = EngineIoServerOptions.newFromDefault();
+        engineIoServerOptions.setCorsHandlingDisabled(true);
+        EngineIoServer engineIoServer = new EngineIoServer(engineIoServerOptions);
+        return engineIoServer;
     }
 
     @Bean
