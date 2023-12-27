@@ -24,5 +24,4 @@ public class RoomController {
         String roomName = UUID.randomUUID().toString().substring(0, 8);
         return ResponseEntity.ok(roomName);
     }
-
 }
