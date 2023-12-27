@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * https://socketio.github.io/engine.io-server-java/spring-integration.html
+ * <a href="https://socketio.github.io/engine.io-server-java/spring-integration.html">...</a>
  */
 @Controller
 public final class EngineIoHandler implements HandshakeInterceptor, WebSocketHandler {
@@ -143,7 +143,7 @@ public final class EngineIoHandler implements HandshakeInterceptor, WebSocketHan
 
         void handleMessage(WebSocketMessage<?> message) {
             if (message.getPayload() instanceof String || message.getPayload() instanceof byte[]) {
-                emit("message", (Object) message.getPayload());
+                emit("message", message.getPayload());
             } else {
                 throw new RuntimeException(String.format(
                     "Invalid message type received: %s. Expected String or byte[].",
