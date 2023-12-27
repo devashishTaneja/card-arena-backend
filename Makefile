@@ -1,3 +1,10 @@
-build-run:
+server:
+	./gradlew build
+	docker stop cardbackend
+	docker rm cardbackend
 	docker build -t cardbackend .
-	docker run -d -p 8080:8080 cardbackend
+	docker run -p 8080:8080 --name=cardbackend  cardbackend
+
+stop:
+	docker stop cardbackend
+	docker rm cardbackend
