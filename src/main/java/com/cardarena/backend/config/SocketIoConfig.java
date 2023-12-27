@@ -55,7 +55,7 @@ public class SocketIoConfig {
                     log.info("Joined game {}", gameId);
                 } catch (Exception e) {
                     log.error("Error joining game", e);
-                    socket.send("error", e.getMessage());
+                    socket.send(gameConstants.ERROR, e.getMessage());
                 }
             });
 
@@ -70,7 +70,22 @@ public class SocketIoConfig {
                     log.info("Started game {}", gameId);
                 } catch (Exception e) {
                     log.error("Error starting game", e);
-                    socket.send("error", e.getMessage());
+                    socket.send(gameConstants.ERROR, e.getMessage());
+                }
+            });
+
+            socket.on(gameConstants.CALL_HANDS, args1 -> {
+                try {
+                    JSONObject jsonObject = (JSONObject) args1[0];
+                    String gameId = jsonObject.getString(gameConstants.GAME_ID);
+                    Integer handsCalled = jsonObject.getInt(gameConstants.HANDS_CALLED);
+                    Game game = gameService.findOrInitializeGame(gameId);
+                    game = gameService.call(game, socket.getId(), handsCalled);
+                    broadcastGameState(namespace, game, gameService);
+                    log.info("Started game {}", gameId);
+                } catch (Exception e) {
+                    log.error("Error starting game", e);
+                    socket.send(gameConstants.ERROR, e.getMessage());
                 }
             });
         });

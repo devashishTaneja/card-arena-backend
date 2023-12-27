@@ -1,5 +1,6 @@
 package com.cardarena.backend.service;
 
+import com.cardarena.backend.exception.InvalidTurnException;
 import com.cardarena.backend.models.core.*;
 import com.cardarena.backend.repository.core.GameRepository;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,7 @@ public class GameService {
             }
         }).toList();
         game.setPlayers(players);
+        game.setDeck(null);
         return game.toString();
     }
 
@@ -72,7 +74,9 @@ public class GameService {
         return game;
     }
 
-    public Game call(Game game, Integer handsCalled) {
+    public Game call(Game game, String playerId,Integer handsCalled) {
+        if(playerId==null || !playerId.equals(game.getPlayers().get(game.getChance()).getId()))
+            throw new InvalidTurnException();
         game.getScorecard().getHandsCalled().put(game.getChance(), handsCalled);
         log.info("Player {} called {} hands!", game.getChance(), handsCalled);
         game.setChance((game.getChance() + 1) % game.numberOfPlayers());
