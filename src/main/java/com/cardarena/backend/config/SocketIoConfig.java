@@ -26,10 +26,9 @@ public class SocketIoConfig {
     @Bean
     EngineIoServer engineIoServer() {
         EngineIoServerOptions engineIoServerOptions = EngineIoServerOptions.newFromDefault();
-        engineIoServerOptions.setCorsHandlingDisabled(false);
+        engineIoServerOptions.setCorsHandlingDisabled(true);
         engineIoServerOptions.setAllowSyncPolling(false);
-        EngineIoServer engineIoServer = new EngineIoServer(engineIoServerOptions);
-        return engineIoServer;
+        return new EngineIoServer(engineIoServerOptions);
     }
 
     @Bean

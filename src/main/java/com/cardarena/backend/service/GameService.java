@@ -45,9 +45,17 @@ public class GameService {
             game.setOwnerId(player.getId());
         }
         // Return if player already exists
-        if(currentPlayers.stream().anyMatch(player1 -> player1.getId().equals(player.getId()))) return game;
-        currentPlayers.add(player);
-        game.setPlayers(currentPlayers);
+        final boolean[] playerExist = {false};
+        currentPlayers.forEach(curPlayer -> {
+            if(curPlayer.getSessionId().equals(player.getSessionId())){
+                playerExist[0] = true;
+                curPlayer.setId(player.getId());
+            }
+        });
+        if(!playerExist[0]){
+            currentPlayers.add(player);
+            game.setPlayers(currentPlayers);
+        }
         return gameRepository.save(game);
     }
 
