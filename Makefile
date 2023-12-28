@@ -8,3 +8,7 @@ server:
 stop:
 	docker stop cardbackend
 	docker rm cardbackend
+
+start-local:
+	./gradlew build
+	java -jar build/libs/card_arena-1.0.0.jar
