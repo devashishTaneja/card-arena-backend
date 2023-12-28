@@ -52,10 +52,10 @@ public class SocketIoConfig {
                     JSONObject jsonObject = (JSONObject) args1[0];
                     String gameId = jsonObject.getString(gameConstants.GAME_ID);
                     String playerName = jsonObject.getString(gameConstants.PLAYER_NAME);
+                    String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
                     socket.joinRoom(gameId);
                     Game game = gameService.findOrInitializeGame(gameId);
-                    String playerId = socket.getId();
-                    game = gameService.addPlayer(game, new Player(playerId, playerName));
+                    game = gameService.addPlayer(game, new Player(socket.getId(), playerSessionId, playerName));
                     log.info("Joined game {} - player - {}", gameId, playerName);
                     broadcastGameState(namespace, game, gameService);
                 } catch (Exception e) {
@@ -69,7 +69,9 @@ public class SocketIoConfig {
                 try {
                     JSONObject jsonObject = (JSONObject) args1[0];
                     String gameId = jsonObject.getString(gameConstants.GAME_ID);
+                    String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
                     Game game = gameService.findOrInitializeGame(gameId);
+                    game = gameService.validatePlayer(game, playerSessionId, socket.getId());
                     game = gameService.startGame(game);
                     broadcastGameState(namespace, game, gameService);
                     log.info("Started game {}", gameId);
@@ -84,7 +86,9 @@ public class SocketIoConfig {
                     JSONObject jsonObject = (JSONObject) args1[0];
                     String gameId = jsonObject.getString(gameConstants.GAME_ID);
                     Integer handsCalled = jsonObject.getInt(gameConstants.HANDS_CALLED);
+                    String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
                     Game game = gameService.findOrInitializeGame(gameId);
+                    game = gameService.validatePlayer(game, playerSessionId, socket.getId());
                     game = gameService.call(game, socket.getId(), handsCalled);
                     broadcastGameState(namespace, game, gameService);
                     log.info("Started game {}", gameId);

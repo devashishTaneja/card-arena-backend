@@ -8,6 +8,7 @@ public class GameConstants {
     public final String JOIN_GAME = "joinGame";
     public final String GAME_ID = "gameId";
     public final String PLAYER_NAME = "playerName";
+    public final String PLAYER_SESSION_ID = "playerSessionId";
     public final String STATE_UPDATE = "stateUpdate";
     public final String ERROR = "error";
     public final String CALL_HANDS = "callHands";

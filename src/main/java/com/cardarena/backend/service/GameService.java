@@ -11,10 +11,15 @@ import java.util.*;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class GameService {
 
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
+    private final Random random;
+
+    GameService(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
+        this.random = new Random();
+    }
 
     private static final int TOTAL_CARD_COUNT = 52;
 
@@ -46,9 +51,19 @@ public class GameService {
         return gameRepository.save(game);
     }
 
+    public Game validatePlayer(Game game, String playerSessionId, String socketId) {
+        game.getPlayers()
+            .forEach(player -> {
+                if (player.getSessionId().equals(playerSessionId) && !Objects.equals(player.getId(), socketId)) {
+                    player.setId(socketId);
+                }
+            });
+        return game;
+    }
+
     public String getGameState(Game game, String playerId) {
         List<Player> players = game.getPlayers();
-        players = players.stream().peek(player -> {
+        players = players.stream().map(player -> {
             if (!player.getId().equals(playerId)) {
                 List<Card> cards = player.getCards().stream().map(card -> {
                     card.setRank(null);
@@ -57,6 +72,7 @@ public class GameService {
                 }).toList();
                 player.setCards(cards);
             }
+            return player;
         }).toList();
         game.setPlayers(players);
         game.setDeck(null);
@@ -138,7 +154,6 @@ public class GameService {
         int totalCardsToBeDistributed = numOfCards * game.numberOfPlayers();
         List<Card> cards=game.getDeck().getCards();
         for(int i=0; i<totalCardsToBeDistributed; i++){
-            Random random = new Random();
             Card card = cards.get(random.nextInt(cards.size()+1)-1);
             game.getPlayers().get(i % game.numberOfPlayers()).getCards().add(card);
             cards.remove(card);
@@ -146,10 +161,5 @@ public class GameService {
         game.setDeck(new Deck(cards));
     }
 
-    private Card drawCardAtRandom(Deck deck){
-        List<Card> cards=deck.getCards();
-        Random random = new Random();
-        return cards.get(random.nextInt(cards.size()));
-    }
 
 }
