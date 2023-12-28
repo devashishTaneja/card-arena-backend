@@ -24,6 +24,7 @@ public class Game {
     public Integer lastSetFirstChance;
     public boolean isGameFinished;
     public boolean isSetFinished;
+    public boolean isCallFinished;
 
     public Integer numberOfPlayers(){
         return players.size();
