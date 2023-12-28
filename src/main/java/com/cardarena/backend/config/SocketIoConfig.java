@@ -26,7 +26,8 @@ public class SocketIoConfig {
     @Bean
     EngineIoServer engineIoServer() {
         EngineIoServerOptions engineIoServerOptions = EngineIoServerOptions.newFromDefault();
-        engineIoServerOptions.setCorsHandlingDisabled(true);
+        engineIoServerOptions.setCorsHandlingDisabled(false);
+        engineIoServerOptions.setAllowSyncPolling(false);
         EngineIoServer engineIoServer = new EngineIoServer(engineIoServerOptions);
         return engineIoServer;
     }
@@ -55,8 +56,8 @@ public class SocketIoConfig {
                     Game game = gameService.findOrInitializeGame(gameId);
                     String playerId = socket.getId();
                     game = gameService.addPlayer(game, new Player(playerId, playerName));
+                    log.info("Joined game {} - player - {}", gameId, playerName);
                     broadcastGameState(namespace, game, gameService);
-                    log.info("Joined game {}", gameId);
                 } catch (Exception e) {
                     log.error("Error joining game", e);
                     socket.send(gameConstants.ERROR, e.getMessage());
@@ -96,9 +97,13 @@ public class SocketIoConfig {
     }
 
     private void broadcastGameState(SocketIoNamespace namespace, Game game, GameService gameService) {
+        log.info("Broadcasting game state {}", game);
         String room = game.getId();
         Arrays.stream(namespace.getAdapter().listClients(room)).forEach(
-            socket -> socket.send(gameConstants.STATE_UPDATE, gameService.getGameState(game, socket.getId()))
+            socket -> {
+                log.info("Sending game state to {}", socket.getId());
+                socket.send(gameConstants.STATE_UPDATE, gameService.getGameState(game, socket.getId()));
+            }
         );
     }
 }
