@@ -53,7 +53,8 @@ jobs:
         run: |
           echo "${{ secrets.EC2_PEM_FILE }}" | base64 -d > ec2-key.pem
           chmod 600 ec2-key.pem
-          ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_IP "aws ecr get-login-password | sudo docker login --username AWS --password-stdin $ECR_REGISTRY && \
-            sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG && \
-            sudo docker-compose -f /home/ec2-user/docker-compose.yml up -d &&
-            sudo docker image prune -af"
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_IP "sudo su && \
+            aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_REGISTRY && \
+            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG && \
+            docker-compose -f /home/ec2-user/docker-compose.yml up -d &&
+            docker image prune -af"

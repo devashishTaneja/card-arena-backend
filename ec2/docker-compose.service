@@ -1,0 +1,14 @@
+# docker-compose-app.service for systemd to run on boot
+[Unit]
+Description=Docker Compose Application
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash -c "docker-compose -f /home/ec2-user/docker-compose.yml up -d"
+ExecStop=/bin/bash -c "docker-compose -f /home/ec2-user/docker-compose.yml down"
+
+[Install]
+WantedBy=multi-user.target

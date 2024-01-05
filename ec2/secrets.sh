@@ -1,0 +1,4 @@
+export MONGODB_USERNAME=
+export MONGODB_PASSWORD=
+export SPRING_PROFILES_ACTIVE=prod
+export NODE_ENV=production

@@ -25,6 +25,24 @@ public class Game {
     public boolean isGameFinished;
     public boolean isSetFinished;
     public boolean isCallFinished;
+    public GameStatus gameStatus;
+
+    public Game(Game game) {
+        this.id = game.id;
+        this.ownerId = game.ownerId;
+        this.numOfCards = game.numOfCards;
+        this.players = game.players;
+        this.deck = game.deck;
+        this.chance = game.chance;
+        this.currSetNumber = game.currSetNumber;
+        this.scorecard = game.scorecard;
+        this.table = game.table;
+        this.lastSetFirstChance = game.lastSetFirstChance;
+        this.isGameFinished = game.isGameFinished;
+        this.isSetFinished = game.isSetFinished;
+        this.isCallFinished = game.isCallFinished;
+        this.gameStatus = game.gameStatus;
+    }
 
     public Integer numberOfPlayers(){
         return players.size();
@@ -40,3 +58,4 @@ public class Game {
         }
     }
 }
+

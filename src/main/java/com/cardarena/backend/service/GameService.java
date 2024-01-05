@@ -3,7 +3,6 @@ package com.cardarena.backend.service;
 import com.cardarena.backend.exception.InvalidTurnException;
 import com.cardarena.backend.models.core.*;
 import com.cardarena.backend.repository.core.GameRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +31,7 @@ public class GameService {
                 .deck(new Deck())
                 .isGameFinished(false)
                 .isSetFinished(false)
+                .gameStatus(GameStatus.WAITING_FOR_PLAYERS)
                 .build();
             gameRepository.save(game);
         }
@@ -70,21 +70,12 @@ public class GameService {
     }
 
     public String getGameState(Game game, String playerId) {
+        Game gameCopy = new Game(game);
         List<Player> players = game.getPlayers();
-        players = players.stream().map(player -> {
-            if (!player.getId().equals(playerId)) {
-                List<Card> cards = player.getCards().stream().map(card -> {
-                    card.setRank(null);
-                    card.setSuit(null);
-                    return card;
-                }).toList();
-                player.setCards(cards);
-            }
-            return player;
-        }).toList();
-        game.setPlayers(players);
-        game.setDeck(null);
-        return game.toString();
+        players = players.stream().map(player -> new Player(player, player.getId().equals(playerId))).toList();
+        gameCopy.setPlayers(players);
+        gameCopy.setDeck(null);
+        return gameCopy.toString();
     }
 
     public Game startGame(Game game) {
@@ -93,6 +84,7 @@ public class GameService {
         game.setScorecard(new Scorecard());
         game.setDeck(new Deck());
         game.getPlayers().forEach(player -> player.setCards(new ArrayList<>()));
+        game.setGameStatus(GameStatus.STARTED);
         startNextSet(game);
         gameRepository.save(game);
         return game;
