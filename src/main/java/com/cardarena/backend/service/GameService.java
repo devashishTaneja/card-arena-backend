@@ -72,7 +72,7 @@ public class GameService {
     public String getGameState(Game game, String playerId) {
         Game gameCopy = new Game(game);
         List<Player> players = game.getPlayers();
-        players = players.stream().map(player -> new Player(player, player.getId().equals(playerId))).toList();
+        players = players.stream().map(player -> new Player(player, !player.getId().equals(playerId))).toList();
         gameCopy.setPlayers(players);
         gameCopy.setDeck(null);
         return gameCopy.toString();
