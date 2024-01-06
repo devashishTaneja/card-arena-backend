@@ -1,8 +1,7 @@
 package com.cardarena.backend.config;
 
 import com.cardarena.backend.constants.GameConstants;
-import com.cardarena.backend.models.core.Game;
-import com.cardarena.backend.models.core.Player;
+import com.cardarena.backend.models.core.*;
 import com.cardarena.backend.service.GameService;
 import io.socket.engineio.server.Emitter;
 import io.socket.engineio.server.EngineIoServer;
@@ -89,6 +88,24 @@ public class SocketIoConfig {
                     Game game = gameService.findOrInitializeGame(gameId);
                     game = gameService.validatePlayer(game, playerSessionId, socket.getId());
                     game = gameService.call(game, socket.getId(), handsCalled);
+                    broadcastGameState(namespace, game, gameService);
+                    log.info("Started game {}", gameId);
+                } catch (Exception e) {
+                    log.error("Error starting game", e);
+                    socket.send(gameConstants.ERROR, e.getMessage());
+                }
+            });
+            socket.on(gameConstants.PLAY_CARD, args1 -> {
+                try {
+                    JSONObject jsonObject = (JSONObject) args1[0];
+                    String gameId = jsonObject.getString(gameConstants.GAME_ID);
+                    Rank cardRank = Rank.valueOf(jsonObject.getString(gameConstants.CARD_RANK));
+                    Suit cardSuit = Suit.valueOf(jsonObject.getString(gameConstants.CARD_SUIT));
+                    Card card = new Card(cardSuit, cardRank);
+                    String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
+                    Game game = gameService.findOrInitializeGame(gameId);
+                    game = gameService.validatePlayer(game, playerSessionId, socket.getId());
+                    game = gameService.playCard(game, playerSessionId, card);
                     broadcastGameState(namespace, game, gameService);
                     log.info("Started game {}", gameId);
                 } catch (Exception e) {

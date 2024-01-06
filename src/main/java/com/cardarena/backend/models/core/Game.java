@@ -17,14 +17,13 @@ public class Game {
     public Integer numOfCards;
     public List<Player> players;
     public Deck deck;
+    public Suit trump;
     public Integer chance;
     public Integer currSetNumber;
     public Scorecard scorecard;
     public Table table;
     public Integer lastSetFirstChance;
-    public boolean isGameFinished;
     public boolean isSetFinished;
-    public boolean isCallFinished;
     public GameStatus gameStatus;
 
     public Game(Game game) {
@@ -38,9 +37,7 @@ public class Game {
         this.scorecard = game.scorecard;
         this.table = game.table;
         this.lastSetFirstChance = game.lastSetFirstChance;
-        this.isGameFinished = game.isGameFinished;
         this.isSetFinished = game.isSetFinished;
-        this.isCallFinished = game.isCallFinished;
         this.gameStatus = game.gameStatus;
     }
 
@@ -48,7 +45,6 @@ public class Game {
         return players.size();
     }
 
-    // Add a method to convert the object to JSON string
     public String toString() {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GameConstants {
+
+    public final String TRUMP_SUIT = "DIAMONDS";
     public final String START_GAME = "startGame";
     public final String JOIN_GAME = "joinGame";
     public final String GAME_ID = "gameId";
@@ -12,5 +14,8 @@ public class GameConstants {
     public final String STATE_UPDATE = "stateUpdate";
     public final String ERROR = "error";
     public final String CALL_HANDS = "callHands";
+    public final String PLAY_CARD = "playCard";
+    public final String CARD_RANK = "cardRank";
+    public final String CARD_SUIT = "cardSuit";
     public final String HANDS_CALLED = "handsCalled";
 }
