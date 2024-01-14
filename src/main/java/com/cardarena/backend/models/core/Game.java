@@ -35,6 +35,7 @@ public class Game {
         this.chance = game.chance;
         this.currSetNumber = game.currSetNumber;
         this.scorecard = game.scorecard;
+        this.trump = game.trump;
         this.table = game.table;
         this.lastSetFirstChance = game.lastSetFirstChance;
         this.isSetFinished = game.isSetFinished;

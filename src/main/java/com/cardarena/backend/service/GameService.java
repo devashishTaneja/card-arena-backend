@@ -43,7 +43,7 @@ public class GameService {
         List<Player> currentPlayers = game.getPlayers();
         if(currentPlayers == null){
             currentPlayers = new ArrayList<>();
-            game.setOwnerId(player.getId());
+            game.setOwnerId(player.getSessionId());
         }
         // Return if player already exists
         final boolean[] playerExist = {false};
