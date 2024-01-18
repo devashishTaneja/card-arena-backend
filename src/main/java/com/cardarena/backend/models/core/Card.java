@@ -18,7 +18,9 @@ public class Card {
     public boolean compareTo(Card card, Suit trumpSuit) {
         if (this.suit == card.suit) {
             return this.rank.ordinal() < card.rank.ordinal();
-        } else return !card.suit.equals(trumpSuit);
+        } else if (this.suit == trumpSuit) {
+            return true;
+        } else return card.suit != trumpSuit;
     }
 
     @Override
