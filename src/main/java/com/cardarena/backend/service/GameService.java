@@ -177,7 +177,8 @@ public class GameService {
         Scorecard scorecard = game.getScorecard().get(game.getCurrSetNumber()-1);
         List<Integer> handsCalled = scorecard.getHandsCalled();
         List<Integer> handsWon = scorecard.getHandsWon();
-        for(int i=0; i<game.numberOfPlayers(); i++) {
+        int n = game.numberOfPlayers();
+        for(int i=0; i<n; i++) {
             if(handsCalled.get(i) == 0 && handsWon.get(i) == 0){
                 scorecard.getScores().set(i,game.getCurrSetNumber());
             } else if(Objects.equals(handsCalled.get(i), handsWon.get(i))) {
@@ -187,10 +188,11 @@ public class GameService {
             }
         }
         List<Integer> totalScores = game.getTotalScores();
-        if(totalScores == null) totalScores = new ArrayList<>(Collections.nCopies(game.numberOfPlayers(), 0));
+        if(totalScores == null) totalScores = new ArrayList<>(Collections.nCopies(n, 0));
         for(int i=0; i<game.numberOfPlayers(); i++) {
             totalScores.set(i, totalScores.get(i) + scorecard.getScores().get(i));
         }
+        game.setTotalScores(totalScores);
     }
 
     private void distributeCards(Game game, int numOfCards){

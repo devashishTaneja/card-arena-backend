@@ -12,12 +12,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 class GameServiceTest {
     @Test
     void testCompareCards() {
-        // Arrange
         Card card1 = new Card(Suit.HEARTS, Rank.ACE);
         Card card2 = new Card(Suit.HEARTS, Rank.EIGHT);
         Suit trumpSuit = Suit.DIAMONDS;
-
-        // Act
         assertTrue(card1.compareTo(card2, trumpSuit));
+
+        card1 = new Card(Suit.SPADES, Rank.TWO);
+        card2 = new Card(Suit.HEARTS, Rank.EIGHT);
+        assertTrue(card1.compareTo(card2, trumpSuit));
+
+        card1 = new Card(Suit.DIAMONDS, Rank.ACE);
+        card2 = new Card(Suit.HEARTS, Rank.EIGHT);
+        assertTrue(card1.compareTo(card2, trumpSuit));
+
+        card1 = new Card(Suit.HEARTS, Rank.ACE);
+        card2 = new Card(Suit.DIAMONDS, Rank.TWO);
+        assertFalse(card1.compareTo(card2, trumpSuit));
     }
 }
