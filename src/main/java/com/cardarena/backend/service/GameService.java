@@ -186,6 +186,11 @@ public class GameService {
                 scorecard.getScores().set(i, -Math.abs(handsCalled.get(i) - handsWon.get(i)));
             }
         }
+        List<Integer> totalScores = game.getTotalScores();
+        if(totalScores == null) totalScores = new ArrayList<>(Collections.nCopies(game.numberOfPlayers(), 0));
+        for(int i=0; i<game.numberOfPlayers(); i++) {
+            totalScores.set(i, totalScores.get(i) + scorecard.getScores().get(i));
+        }
     }
 
     private void distributeCards(Game game, int numOfCards){

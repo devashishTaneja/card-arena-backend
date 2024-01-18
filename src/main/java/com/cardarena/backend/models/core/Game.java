@@ -20,6 +20,7 @@ public class Game {
     public Integer chance;
     public Integer currSetNumber;
     public List<Scorecard> scorecard;
+    public List<Integer> totalScores;
     public Table table;
     // First person to call hands in this set
     public Integer lastSetFirstChance;
@@ -42,6 +43,7 @@ public class Game {
         this.gameStatus = game.gameStatus;
         this.lastRoundWinner = game.lastRoundWinner;
         this.scorecard = game.scorecard;
+        this.totalScores = game.totalScores;
     }
 
     public Integer numberOfPlayers(){
