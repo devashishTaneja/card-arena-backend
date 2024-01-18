@@ -85,13 +85,13 @@ public class SocketIoConfig {
                     String gameId = jsonObject.getString(gameConstants.GAME_ID);
                     Integer handsCalled = jsonObject.getInt(gameConstants.HANDS_CALLED);
                     String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
+                    log.info("Player {} called for {} Hands with {}", playerSessionId, handsCalled,jsonObject);
                     Game game = gameService.findOrInitializeGame(gameId);
                     game = gameService.validatePlayer(game, playerSessionId, socket.getId());
-                    game = gameService.call(game, socket.getId(), handsCalled);
+                    game = gameService.call(game, playerSessionId, handsCalled);
                     broadcastGameState(namespace, game, gameService);
-                    log.info("Started game {}", gameId);
                 } catch (Exception e) {
-                    log.error("Error starting game", e);
+                    log.error("Error calling hands", e);
                     socket.send(gameConstants.ERROR, e.getMessage());
                 }
             });
@@ -103,13 +103,29 @@ public class SocketIoConfig {
                     Suit cardSuit = Suit.valueOf(jsonObject.getString(gameConstants.CARD_SUIT));
                     Card card = new Card(cardSuit, cardRank);
                     String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
+                    log.info("{} Playing card {} of {}", playerSessionId, card.rank, card.suit);
                     Game game = gameService.findOrInitializeGame(gameId);
                     game = gameService.validatePlayer(game, playerSessionId, socket.getId());
                     game = gameService.playCard(game, playerSessionId, card);
                     broadcastGameState(namespace, game, gameService);
-                    log.info("Started game {}", gameId);
                 } catch (Exception e) {
-                    log.error("Error starting game", e);
+                    log.error("Error playing card", e);
+                    socket.send(gameConstants.ERROR, e.getMessage());
+                }
+            });
+
+            socket.on(gameConstants.NEXT_HAND, args1 -> {
+                try {
+                    JSONObject jsonObject = (JSONObject) args1[0];
+                    String gameId = jsonObject.getString(gameConstants.GAME_ID);
+                    String playerSessionId = jsonObject.getString(gameConstants.PLAYER_SESSION_ID);
+                    log.info("{} Starting next hand", playerSessionId);
+                    Game game = gameService.findOrInitializeGame(gameId);
+                    game = gameService.validatePlayer(game, playerSessionId, socket.getId());
+                    game = gameService.nextSetOrRound(game);
+                    broadcastGameState(namespace, game, gameService);
+                } catch (Exception e) {
+                    log.error("Error starting next hand", e);
                     socket.send(gameConstants.ERROR, e.getMessage());
                 }
             });

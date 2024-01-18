@@ -5,6 +5,7 @@ public enum GameStatus {
     STARTING_SET,
     CALLING_HANDS,
     PLAYING,
+    DECLARE_WINNER,
     FINISHED,
     ERROR
 }

@@ -15,6 +15,7 @@ public class GameConstants {
     public final String ERROR = "error";
     public final String CALL_HANDS = "callHands";
     public final String PLAY_CARD = "playCard";
+    public final String NEXT_HAND = "nextHand";
     public final String CARD_RANK = "cardRank";
     public final String CARD_SUIT = "cardSuit";
     public final String HANDS_CALLED = "handsCalled";

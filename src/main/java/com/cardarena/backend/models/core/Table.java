@@ -9,5 +9,4 @@ import java.util.List;
 @Setter
 public class Table {
     public List<Card> cardsOnDisplay;
-    public List<Card> hiddenCards;
 }

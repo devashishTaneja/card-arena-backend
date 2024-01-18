@@ -15,7 +15,7 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final Random random;
-    private GameConstants gameConstants;
+    private GameConstants gameConstants = new GameConstants();
 
     GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
@@ -30,7 +30,6 @@ public class GameService {
             game = Game
                 .builder()
                 .id(roomId)
-                .deck(new Deck())
                 .isSetFinished(false)
                 .gameStatus(GameStatus.WAITING_FOR_PLAYERS)
                 .build();
@@ -75,15 +74,13 @@ public class GameService {
         List<Player> players = game.getPlayers();
         players = players.stream().map(player -> new Player(player, !player.getId().equals(playerId))).toList();
         gameCopy.setPlayers(players);
-        gameCopy.setDeck(null);
         return gameCopy.toString();
     }
 
     public Game startGame(Game game) {
         game.setCurrSetNumber(0);
         game.setLastSetFirstChance(-1);
-        game.setScorecard(new Scorecard());
-        game.setDeck(new Deck());
+        game.setScorecard(new ArrayList<>());
         game.getPlayers().forEach(player -> player.setCards(new ArrayList<>()));
         game.setGameStatus(GameStatus.STARTING_SET);
         startNextSet(game);
@@ -102,14 +99,16 @@ public class GameService {
         log.info("Starting Set: " + game.getCurrSetNumber() + ",distributing "  + game.getCurrSetNumber() + " cards to each player");
         game.setChance((game.getLastSetFirstChance()+1)%numOfPlayers);
         game.setLastSetFirstChance(game.getChance());
+        game.setLastRoundWinner(game.getChance());
+        game.getScorecard().add(new Scorecard(numOfPlayers));
         distributeCards(game, game.getCurrSetNumber());
         game.setGameStatus(GameStatus.CALLING_HANDS);
     }
 
     public Game call(Game game, String playerId, Integer handsCalled) {
-        if(playerId==null || !playerId.equals(game.getPlayers().get(game.getChance()).getId()))
+        if(playerId==null || !playerId.equals(game.getPlayers().get(game.getChance()).getSessionId()))
             throw new InvalidTurnException();
-        game.getScorecard().getHandsCalled().put(game.getChance(), handsCalled);
+        game.getScorecard().get(game.getCurrSetNumber()-1).getHandsCalled().set(game.getChance(), handsCalled);
         log.info("Player {} called {} hands!", game.getChance(), handsCalled);
         game.setChance((game.getChance() + 1) % game.numberOfPlayers());
         if(Objects.equals(game.getChance(), game.getLastSetFirstChance())) {
@@ -122,45 +121,54 @@ public class GameService {
     }
 
     private void StartNextRound(Game game){
+        game.setLastRoundWinner(game.getChance());
         game.setTable(new Table());
         game.getTable().setCardsOnDisplay(new ArrayList<>());
-        game.getTable().setHiddenCards(new ArrayList<>());
     }
 
     public Game playCard(Game game,String PlayerId, Card card){
-        if(PlayerId==null || !PlayerId.equals(game.getPlayers().get(game.getChance()).getId())) {
+        if(PlayerId==null || !PlayerId.equals(game.getPlayers().get(game.getChance()).getSessionId())) {
             throw new InvalidTurnException();
         }
+        game.getPlayers().get(game.getChance()).getCards().removeIf(car->card.getRank().equals(car.getRank()) && card.getSuit().equals(car.getSuit()));
         game.getTable().getCardsOnDisplay().add(card);
         game.setChance((game.getChance()+1)%game.getPlayers().size());
-        game.getPlayers().get(game.getChance()).getCards().remove(card);
         if(game.getTable().getCardsOnDisplay().size()==game.getPlayers().size()){
             updateHands(game);
             log.info("Round Finished!");
-            if(game.getPlayers().get(0).getCards().isEmpty()){
-                startNextSet(game);
-            }
-            else{
-                StartNextRound(game);
-            }
         }
+        gameRepository.save(game);
+        return game;
+    }
+
+    public Game nextSetOrRound(Game game) {
+        game.setGameStatus(GameStatus.PLAYING);
+        game.getTable().getCardsOnDisplay().clear();
+        if(game.getPlayers().get(0).getCards().isEmpty()){
+            startNextSet(game);
+        }
+        else {
+            StartNextRound(game);
+        }
+        gameRepository.save(game);
         return game;
     }
 
     private void updateHands(Game game){
         List<Card> cardsOnDisplay = game.getTable().getCardsOnDisplay();
         Card maxCard = cardsOnDisplay.get(0);
-        int maxCardPlayerId = game.getChance();
+        int maxCardPlayerId = 0;
         for(int i = 1; i<cardsOnDisplay.size(); i++){
             if(compareCards(maxCard, cardsOnDisplay.get(i), Suit.valueOf(gameConstants.TRUMP_SUIT))){
                 maxCard = cardsOnDisplay.get(i);
                 maxCardPlayerId = (game.getChance()+i)%game.getPlayers().size();
             }
         }
-        game.getScorecard().getHandsWon().put(maxCardPlayerId,game.getScorecard().getHandsWon().get(maxCardPlayerId)+1);
+        game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().set(maxCardPlayerId,game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().get(maxCardPlayerId)+1);
+        updateScorecards(game);
         game.setChance(maxCardPlayerId);
+        game.setGameStatus(GameStatus.DECLARE_WINNER);
         log.info("Player "+maxCardPlayerId+" won the hand!");
-        game.getTable().getCardsOnDisplay().clear();
     }
 
     private boolean compareCards(Card card1, Card card2, Suit trumpSuit){
@@ -170,14 +178,29 @@ public class GameService {
         else return card2.getSuit().equals(trumpSuit);
     }
 
+    private void updateScorecards(Game game){
+        Scorecard scorecard = game.getScorecard().get(game.getCurrSetNumber()-1);
+        List<Integer> handsCalled = scorecard.getHandsCalled();
+        List<Integer> handsWon = scorecard.getHandsWon();
+        for(int i=0; i<game.numberOfPlayers(); i++) {
+            if(handsCalled.get(i) == 0){
+                scorecard.getScores().set(i,game.getCurrSetNumber());
+            } else if(Objects.equals(handsCalled.get(i), handsWon.get(i))) {
+                scorecard.getScores().set(i, handsCalled.get(i) * 2);
+            } else {
+                scorecard.getScores().set(i, -Math.abs(handsCalled.get(i) - handsWon.get(i)));
+            }
+        }
+    }
+
     private void distributeCards(Game game, int numOfCards){
         int totalCardsToBeDistributed = numOfCards * game.numberOfPlayers();
-        List<Card> cards=game.getDeck().getCards();
+        List<Card> cards=new Deck().getCards();
         for(int i=0; i<totalCardsToBeDistributed; i++){
-            Card card = cards.get(random.nextInt(cards.size()+1)-1);
+            int selectedCardIndex = random.nextInt(cards.size())-1;
+            Card card = cards.get(selectedCardIndex);
             game.getPlayers().get(i % game.numberOfPlayers()).getCards().add(card);
-            cards.remove(card);
+            cards.remove(selectedCardIndex);
         }
-        game.setDeck(new Deck(cards));
     }
 }
