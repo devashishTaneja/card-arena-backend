@@ -20,4 +20,12 @@ public class Card {
             return this.rank.ordinal() < card.rank.ordinal();
         } else return !card.suit.equals(trumpSuit);
     }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "suit=" + suit +
+                ", rank=" + rank +
+                '}';
+    }
 }
