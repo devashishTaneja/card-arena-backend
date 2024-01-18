@@ -176,7 +176,7 @@ public class GameService {
 
     private boolean compareCards(Card card1, Card card2, Suit trumpSuit){
         if(card1.getSuit().equals(card2.getSuit())){
-            return card1.getRank().ordinal()<card2.getRank().ordinal();
+            return card1.getRank().ordinal()>card2.getRank().ordinal();
         }
         else return card2.getSuit().equals(trumpSuit);
     }
