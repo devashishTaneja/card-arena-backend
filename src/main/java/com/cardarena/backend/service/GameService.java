@@ -31,6 +31,7 @@ public class GameService {
                 .builder()
                 .id(roomId)
                 .isSetFinished(false)
+                .totalScores(List.of())
                 .gameStatus(GameStatus.WAITING_FOR_PLAYERS)
                 .build();
             gameRepository.save(game);
@@ -39,9 +40,6 @@ public class GameService {
     }
 
     public Game addPlayer(Game game, Player player) {
-        if(game.getGameStatus() != GameStatus.WAITING_FOR_PLAYERS) {
-            throw new GameAlreadyStartedException();
-        }
         List<Player> currentPlayers = game.getPlayers();
         if(currentPlayers == null){
             currentPlayers = new ArrayList<>();
@@ -56,6 +54,7 @@ public class GameService {
             }
         });
         if(!playerExist[0]){
+            if(game.getGameStatus() != GameStatus.WAITING_FOR_PLAYERS) throw new GameAlreadyStartedException();
             currentPlayers.add(player);
             game.setPlayers(currentPlayers);
         }
