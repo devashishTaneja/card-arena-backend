@@ -156,12 +156,15 @@ public class GameService {
 
     private void updateHands(Game game){
         List<Card> cardsOnDisplay = game.getTable().getCardsOnDisplay();
-        Card maxCard = cardsOnDisplay.get(0);
-        int maxCardPlayerId = 0;
-        for(int i = 1; i<cardsOnDisplay.size(); i++){
-            if(compareCards(maxCard, cardsOnDisplay.get(i), Suit.valueOf(gameConstants.TRUMP_SUIT))){
-                maxCard = cardsOnDisplay.get(i);
-                maxCardPlayerId = (game.getChance()+i)%game.getPlayers().size();
+        int chance = game.getChance();
+        int n = game.getPlayers().size();
+        Card maxCard = cardsOnDisplay.get(chance);
+        int maxCardPlayerId = chance;
+        for(int i = 1; i<n; i++) {
+            int curChance = (chance+i)%n;
+            if(compareCards(maxCard, cardsOnDisplay.get(curChance%n), Suit.valueOf(gameConstants.TRUMP_SUIT))){
+                maxCard = cardsOnDisplay.get(curChance%n);
+                maxCardPlayerId = curChance%n;
             }
         }
         game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().set(maxCardPlayerId,game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().get(maxCardPlayerId)+1);
