@@ -155,7 +155,7 @@ public class GameService {
 
     private void updateHands(Game game){
         List<Card> cardsOnDisplay = game.getTable().getCardsOnDisplay();
-        int chance = game.getChance();
+        int chance = game.getLastRoundWinner();
         int n = game.getPlayers().size();
         Card maxCard = cardsOnDisplay.get(chance);
         int maxCardPlayerId = chance;
@@ -170,7 +170,7 @@ public class GameService {
         updateScorecards(game);
         game.setChance(maxCardPlayerId);
         game.setGameStatus(GameStatus.DECLARE_WINNER);
-        log.info("Player "+maxCardPlayerId+" won the hand!");
+        log.info("Player "+maxCardPlayerId+" won the hand with card {} of {}!", maxCard.getRank(), maxCard.getSuit());
     }
 
     private void updateScorecards(Game game){
