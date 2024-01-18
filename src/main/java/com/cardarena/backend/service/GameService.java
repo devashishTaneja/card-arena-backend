@@ -167,7 +167,7 @@ public class GameService {
         }
         maxCardPlayerId= (maxCardPlayerId + chance) % n;
         game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().set(maxCardPlayerId,game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().get(maxCardPlayerId)+1);
-        updateScorecards(game);
+        if(game.getPlayers().get(0).getCards().isEmpty()) updateScorecards(game);
         game.setChance(maxCardPlayerId);
         game.setGameStatus(GameStatus.DECLARE_WINNER);
         log.error("Player {} won the hand with card {}! - Cards {}", maxCardPlayerId, maxCard, cardsOnDisplay) ;
