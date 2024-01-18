@@ -178,7 +178,7 @@ public class GameService {
         List<Integer> handsCalled = scorecard.getHandsCalled();
         List<Integer> handsWon = scorecard.getHandsWon();
         for(int i=0; i<game.numberOfPlayers(); i++) {
-            if(handsCalled.get(i) == 0){
+            if(handsCalled.get(i) == 0 && handsWon.get(i) == 0){
                 scorecard.getScores().set(i,game.getCurrSetNumber());
             } else if(Objects.equals(handsCalled.get(i), handsWon.get(i))) {
                 scorecard.getScores().set(i, handsCalled.get(i) * 2);
