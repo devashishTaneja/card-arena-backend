@@ -6,7 +6,6 @@ import com.cardarena.backend.models.core.*;
 import com.cardarena.backend.repository.core.GameRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Slf4j
@@ -15,7 +14,7 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final Random random;
-    private GameConstants gameConstants = new GameConstants();
+    private final GameConstants gameConstants = new GameConstants();
 
     GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
@@ -162,9 +161,9 @@ public class GameService {
         int maxCardPlayerId = chance;
         for(int i = 1; i<n; i++) {
             int curChance = (chance+i)%n;
-            if(compareCards(maxCard, cardsOnDisplay.get(curChance%n), Suit.valueOf(gameConstants.TRUMP_SUIT))){
-                maxCard = cardsOnDisplay.get(curChance%n);
-                maxCardPlayerId = curChance%n;
+            if(!maxCard.compareTo(cardsOnDisplay.get(curChance), Suit.valueOf(gameConstants.TRUMP_SUIT))) {
+                maxCard = cardsOnDisplay.get(curChance);
+                maxCardPlayerId = curChance;
             }
         }
         game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().set(maxCardPlayerId,game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().get(maxCardPlayerId)+1);
@@ -172,13 +171,6 @@ public class GameService {
         game.setChance(maxCardPlayerId);
         game.setGameStatus(GameStatus.DECLARE_WINNER);
         log.info("Player "+maxCardPlayerId+" won the hand!");
-    }
-
-    private boolean compareCards(Card card1, Card card2, Suit trumpSuit){
-        if(card1.getSuit().equals(card2.getSuit())){
-            return card1.getRank().ordinal()>card2.getRank().ordinal();
-        }
-        else return card2.getSuit().equals(trumpSuit);
     }
 
     private void updateScorecards(Game game){
