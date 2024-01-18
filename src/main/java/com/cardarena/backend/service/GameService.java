@@ -157,15 +157,15 @@ public class GameService {
         List<Card> cardsOnDisplay = game.getTable().getCardsOnDisplay();
         int chance = game.getLastRoundWinner();
         int n = game.getPlayers().size();
-        Card maxCard = cardsOnDisplay.get(chance);
-        int maxCardPlayerId = chance;
+        Card maxCard = cardsOnDisplay.get(0);
+        int maxCardPlayerId = 0;
         for(int i = 1; i<n; i++) {
-            int curChance = (chance+i)%n;
-            if(!maxCard.compareTo(cardsOnDisplay.get(curChance), Suit.valueOf(gameConstants.TRUMP_SUIT))) {
-                maxCard = cardsOnDisplay.get(curChance);
-                maxCardPlayerId = curChance;
+            if(!maxCard.compareTo(cardsOnDisplay.get(i), Suit.valueOf(gameConstants.TRUMP_SUIT))) {
+                maxCard = cardsOnDisplay.get(i);
+                maxCardPlayerId = i;
             }
         }
+        maxCardPlayerId= (maxCardPlayerId + chance) % n;
         game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().set(maxCardPlayerId,game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().get(maxCardPlayerId)+1);
         updateScorecards(game);
         game.setChance(maxCardPlayerId);
