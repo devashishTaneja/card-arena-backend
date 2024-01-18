@@ -191,7 +191,7 @@ public class GameService {
             }
         }
         List<Integer> totalScores = game.getTotalScores();
-        if(totalScores == null) totalScores = new ArrayList<>(Collections.nCopies(n, 0));
+        if(totalScores == null || totalScores.isEmpty()) totalScores = new ArrayList<>(Collections.nCopies(n, 0));
         for(int i=0; i<game.numberOfPlayers(); i++) {
             totalScores.set(i, totalScores.get(i) + scorecard.getScores().get(i));
         }
