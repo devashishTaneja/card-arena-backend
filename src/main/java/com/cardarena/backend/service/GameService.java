@@ -192,7 +192,7 @@ public class GameService {
         int totalCardsToBeDistributed = numOfCards * game.numberOfPlayers();
         List<Card> cards=new Deck().getCards();
         for(int i=0; i<totalCardsToBeDistributed; i++){
-            int selectedCardIndex = random.nextInt(cards.size())-1;
+            int selectedCardIndex = random.nextInt(cards.size());
             Card card = cards.get(selectedCardIndex);
             game.getPlayers().get(i % game.numberOfPlayers()).getCards().add(card);
             cards.remove(selectedCardIndex);
