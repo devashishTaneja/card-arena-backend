@@ -170,7 +170,7 @@ public class GameService {
         updateScorecards(game);
         game.setChance(maxCardPlayerId);
         game.setGameStatus(GameStatus.DECLARE_WINNER);
-        log.info("Player "+maxCardPlayerId+" won the hand with card {} of {}!", maxCard.getRank(), maxCard.getSuit());
+        log.error("Player {} won the hand with card {}! - Cards {}", maxCardPlayerId, maxCard, cardsOnDisplay) ;
     }
 
     private void updateScorecards(Game game){
