@@ -1,6 +1,7 @@
 package com.cardarena.backend.service;
 
 import com.cardarena.backend.constants.GameConstants;
+import com.cardarena.backend.exception.GameAlreadyStartedException;
 import com.cardarena.backend.exception.InvalidTurnException;
 import com.cardarena.backend.models.core.*;
 import com.cardarena.backend.repository.core.GameRepository;
@@ -38,6 +39,9 @@ public class GameService {
     }
 
     public Game addPlayer(Game game, Player player) {
+        if(game.getGameStatus() != GameStatus.WAITING_FOR_PLAYERS) {
+            throw new GameAlreadyStartedException();
+        }
         List<Player> currentPlayers = game.getPlayers();
         if(currentPlayers == null){
             currentPlayers = new ArrayList<>();
