@@ -114,6 +114,8 @@ public class GameService {
         log.info("Player {} called {} hands!", game.getChance(), handsCalled);
         game.setChance((game.getChance() + 1) % game.numberOfPlayers());
         if(Objects.equals(game.getChance(), game.getLastSetFirstChance())) {
+            Integer totalHandsCalled = game.getScorecard().get(game.getCurrSetNumber()-1).getHandsCalled().stream().reduce(0, Integer::sum);
+            if(totalHandsCalled.equals(game.getCurrSetNumber())) throw new RuntimeException("Cannot call all hands in a set!");
             StartNextRound(game);
             game.setGameStatus(GameStatus.PLAYING);
             log.info("Starting Round!");
