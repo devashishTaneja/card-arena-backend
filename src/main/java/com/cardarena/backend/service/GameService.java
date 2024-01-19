@@ -171,7 +171,8 @@ public class GameService {
             }
         }
         maxCardPlayerId= (maxCardPlayerId + chance) % n;
-        game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().set(maxCardPlayerId,game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon().get(maxCardPlayerId)+1);
+        List<Integer> handsWon = game.getScorecard().get(game.getCurrSetNumber()-1).getHandsWon();
+        handsWon.set(maxCardPlayerId,handsWon.get(maxCardPlayerId)+1);
         if(game.getPlayers().get(0).getCards().isEmpty()) updateScorecards(game);
         game.setChance(maxCardPlayerId);
         game.setGameStatus(GameStatus.DECLARE_WINNER);

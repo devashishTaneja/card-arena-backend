@@ -17,7 +17,7 @@ public class Scorecard {
     public List<Integer> handsWon;
     public List<Integer> scores;
     public Scorecard(Integer numOfPlayers){
-        this.handsCalled = new ArrayList<>(Collections.nCopies(numOfPlayers, 0));
+        this.handsCalled = new ArrayList<>(Collections.nCopies(numOfPlayers, null));
         this.handsWon = new ArrayList<>(Collections.nCopies(numOfPlayers, 0));
         this.scores = new ArrayList<>(Collections.nCopies(numOfPlayers, 0));
     }
